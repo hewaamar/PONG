@@ -12,6 +12,8 @@ namespace PONG
 {
     public partial class Form1 : Form
     {
+
+        // racquet ball
         Rectangle player1 = new Rectangle(100, 100, 10, 60);
         Rectangle player2 = new Rectangle(100, 200, 10, 60);
         Rectangle ball = new Rectangle(295, 195, 10, 10);
