@@ -12,16 +12,16 @@ namespace PONG
 {
     public partial class Form1 : Form
     {
-        Rectangle player1 = new Rectangle(10, 170, 10, 60);
-        Rectangle player2 = new Rectangle(580, 170, 10, 60);
+        Rectangle player1 = new Rectangle(100, 100, 10, 60);
+        Rectangle player2 = new Rectangle(100, 200, 10, 60);
         Rectangle ball = new Rectangle(295, 195, 10, 10);
 
         int player1Score = 0;
         int player2Score = 0;
 
         int playerSpeed = 4;
-        int ballXSpeed = 6;
-        int ballYSpeed = 6;
+        int ballXSpeed = 8;
+        int ballYSpeed = 8;
 
         bool wDown = false;
         bool sDown = false;
@@ -30,7 +30,15 @@ namespace PONG
 
         SolidBrush blueBrush = new SolidBrush(Color.DodgerBlue);
         SolidBrush whiteBrush = new SolidBrush(Color.White);
+        
+        int playerTurn = 1;
 
+        bool aDown = false;
+        bool dDown = false;
+        bool leftDown = false;
+        bool rightDown = false;
+
+        Pen playerTurnPen = new Pen(Color.White, 2);
 
         public Form1()
         {
@@ -53,6 +61,18 @@ namespace PONG
                 case Keys.Down:
                     downArrowDown = true;
                     break;
+                case Keys.A:
+                    aDown = true;
+                    break;
+                case Keys.D:
+                    dDown = true;
+                    break;
+                case Keys.Left:
+                    leftDown = true;
+                    break;
+                case Keys.Right:
+                    rightDown = true;
+                    break;
             }
 
         }
@@ -73,6 +93,18 @@ namespace PONG
                 case Keys.Down:
                     downArrowDown = false;
                     break;
+                case Keys.A:
+                    aDown = false;
+                    break;
+                case Keys.D:
+                    dDown = false;
+                    break;
+                case Keys.Left:
+                    leftDown = false;
+                    break;
+                case Keys.Right:
+                    rightDown = false;
+                    break;
             }
 
         }
@@ -87,6 +119,7 @@ namespace PONG
             if (wDown == true && player1.Y > 0)
             {
                 player1.Y -= playerSpeed;
+
             }
 
             if (sDown == true && player1.Y < this.Height - player1.Height)
@@ -104,6 +137,26 @@ namespace PONG
                 player2.Y += playerSpeed;
             }
 
+
+
+            if (aDown == true && player1.X > 0)
+            {
+                player1.X -= playerSpeed;
+            }
+            if (dDown == true && player1.X < 580)
+            {
+                player1.X += playerSpeed;
+            }
+            if (leftDown == true && player1.X > 0)
+            {
+                player2.X -= playerSpeed;
+            }
+            if (rightDown == true && player1.X < 580)
+            {
+                player2.X += playerSpeed;
+            }
+
+
             //ball collision with top and bottom walls
             if (ball.Y < 0 || ball.Y > this.Height - ball.Height)
             {
@@ -111,39 +164,34 @@ namespace PONG
             }
 
             //ball collision with player
-            if (player1.IntersectsWith(ball))
+            if (player1.IntersectsWith(ball) && ball.X < player1.X && playerTurn == 1)
             {
                 ballXSpeed *= -1;
                 ball.X = player1.X + ball.Width;
+                playerTurn = 2;
             }
-            else if (player2.IntersectsWith(ball))
+            else if (player2.IntersectsWith(ball) && ball.X < player1.X && playerTurn == 2)
             {
                 ballXSpeed *= -1;
                 ball.X = player2.X - ball.Width;
+                playerTurn = 2;
             }
 
             //check for point scored
-            if (ball.X < 0)
+            if (ball.X > 580)
+            {
+                ballXSpeed *= -1;
+            }
+            // check for point scored 
+            if (ball.X < 0 && playerTurn == 1)
             {
                 player2Score++;
                 p2ScoreLabel.Text = $"{player2Score}";
-
-                ball.X = 295;
-                ball.Y = 195;
-
-                player1.Y = 170;
-                player2.Y = 170;
             }
-            else if (ball.X > this.Width - ball.Width)
+           if (ball.X < 0 && playerTurn == 2)
             {
                 player1Score++;
-                p1ScoreLabel.Text = $"{player1Score}";
-
-                ball.X = 295;
-                ball.Y = 195;
-
-                player1.Y = 170;
-                player2.Y = 170;
+                p2ScoreLabel.Text = $"{player1Score}";
             }
 
             //check for game over
@@ -165,9 +213,19 @@ namespace PONG
 
         private void Form1_Paint(object sender, PaintEventArgs e)
         {
+            Graphics g = this.CreateGraphics();
             e.Graphics.FillRectangle(blueBrush, player1);
             e.Graphics.FillRectangle(blueBrush, player2);
             e.Graphics.FillRectangle(whiteBrush, ball);
+
+            if (playerTurn == 1)
+            {   
+                g.DrawRectangle(playerTurnPen, player1);
+            }
+            else if (playerTurn == 2)
+            {   
+                g.DrawRectangle(playerTurnPen, player2);    
+            }
         }
     }
 }
